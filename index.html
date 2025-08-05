@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI-оптимизатор объявлений</title>
+  <style>
+    body{font-family:Arial;margin:0;padding:40px;background:#f7f7f7}
+    .card{max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+    textarea{width:100%;min-height:120px;padding:10px;border:1px solid #ccc;border-radius:4px}
+    button{margin-top:15px;padding:10px 20px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer}
+    #result{margin-top:20px;font-size:16px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Улучшите объявление за 30 секунд</h1>
+    <p>Вставьте текст вашего объявления и получите AI-советы бесплатно!</p>
+    <textarea id="adText" placeholder="Продам iPhone 14, 128 ГБ, отличное состояние…"></textarea>
+    <button onclick="analyze()">Получить советы</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function analyze() {
+      const text = document.getElementById('adText').value;
+      const res = await fetch('/analyze', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({text})
+      });
+      const data = await res.json();
+      document.getElementById('result').innerHTML = data.advice;
+    }
+  </script>
+</body>
+</html>
