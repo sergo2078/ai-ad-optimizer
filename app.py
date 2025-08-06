@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
+import os
 import openai
+from flask import Flask, request, jsonify
 
 openai.api_key = os.getenv("DEEPSEEK_API_KEY")
 openai.api_base = "https://api.deepseek.com/v1"   # ← новая строка
@@ -28,3 +29,4 @@ def analyze():
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
