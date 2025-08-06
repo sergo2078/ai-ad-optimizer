@@ -29,4 +29,9 @@ def analyze():
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+# новый маршрут
+from flask import send_from_directory
 
+@app.route("/")
+def index():
+    return send_from_directory(".", "index.html")
