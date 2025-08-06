@@ -1,9 +1,8 @@
 import os
-import openai
-from flask import Flask, request, jsonify
+import openai  # можно оставить openai-библиотеку
 
-openai.api_key = os.getenv("DEEPSEEK_API_KEY")
-openai.api_base = "https://api.deepseek.com/v1"   # ← новая строка
+openai.api_key = os.getenv("KIMI_API_KEY")
+openai.api_base = "https://api.moonshot.cn/v1"   # ← новый endpoint
 
 app = Flask(__name__)
 
@@ -11,14 +10,14 @@ app = Flask(__name__)
 def analyze():
     text = request.json.get("text", "")
     prompt = f"""
-Ты эксперт по продаже на Авито. Дай краткие советы (не более 200 слов):
-1. Проблемы текста.
+Ты профессиональный маркетолог, эксперт по продаже на Авито. Используя техники Игоря Манна Дай краткие советы (не более 200 слов):
+1. Проблемы текста. Лучший вариант текста.
 2. Улучшенный вариант заголовка.
 3. Что сделать с фото.
-Текст объявления: {text}
+Новый кекст объявления: {text}
 """
-    resp = openai.ChatCompletion.create(
-    model="deepseek-chat",   # ← новая модель
+   resp = openai.ChatCompletion.create(
+    model="moonshot-v1-8k",   # или moonshot-v1-32k
     messages=[{"role": "user", "content": prompt}],
     max_tokens=400,
     temperature=0.7
@@ -35,3 +34,4 @@ from flask import send_from_directory
 @app.route("/")
 def index():
     return send_from_directory(".", "index.html")
+
