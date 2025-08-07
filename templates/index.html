@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-улучшение объявлений</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    textarea, button { width: 100%; padding: 10px; margin-top: 10px; font-size: 16px; }
+    .result { background: #f9f9f9; padding: 20px; margin-top: 20px; border: 1px solid #ccc; white-space: pre-line; }
+    .banner { margin-top: 30px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>🚀 Улучши своё объявление</h1>
+  <form method="POST">
+    <label for="user_input">Вставьте описание вашего товара:</label>
+    <textarea name="user_input" rows="6" placeholder="Например: продам катер ТБС-20, 500000 рублей, длина 10 м..."></textarea>
+    <button type="submit">✨ Сгенерировать продающий текст</button>
+  </form>
+
+  {% if result %}
+    <div class="result">
+      <h3>📄 Готовое объявление + советы по фото:</h3>
+      <p>{{ result }}</p>
+    </div>
+  {% endif %}
+
+  <div class="banner">
+    <!-- Подключи сюда AdSense или другой баннер -->
+    <a href="https://example.com" target="_blank">
+      <img src="https://via.placeholder.com/728x90.png?text=Рекламный+баннер+здесь" alt="Реклама">
+    </a>
+  </div>
+</body>
+</html>

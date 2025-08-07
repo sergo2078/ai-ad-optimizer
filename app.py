@@ -1,34 +1,54 @@
+from flask import Flask, render_template, request
+import requests
+import json
 import os
-import openai
-from flask import Flask, request, jsonify, send_from_directory
-
-openai.api_key = os.getenv("KIMI_API_KEY")
-openai.api_base = "https://api.moonshot.cn/v1"
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return send_from_directory(".", "index.html")
+import os
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
-    text = request.json.get("text", "")
-    prompt = f"""
-Ты профессиональный маркетолог, эксперт по продаже на Авито. Используя техники Игоря Манна, дай краткие советы (не более 200 слов):
-1. Проблемы текста и лучший вариант текста.
-2. Улучшенный вариант заголовка.
-3. Что сделать с фото.
-Новый текст объявления: {text}
+REFERER_URL = "https://yourdomain.com"  # (опционально)
+SITE_TITLE = "AI Объявления"  # (опционально)
+
+PROMPT_TEMPLATE = """
+Ты опытный маркетолог и копирайтер. Преобразуй этот текст в продающее объявление, используя техники Игоря Манна, триггеры выгоды, эмоции, ограниченность. Добавь рекомендации по улучшению фотографий.
+Вот описание от пользователя: "{}"
 """
-    resp = openai.ChatCompletion.create(
-        model="moonshot-v1-8k",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=400,
-        temperature=0.7
+
+def generate_ai_response(user_input):
+    prompt = PROMPT_TEMPLATE.format(user_input)
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": REFERER_URL,
+        "X-Title": SITE_TITLE,
+    }
+
+    payload = {
+        "model": "openai/gpt-oss-20b:free",
+        "messages": [{"role": "user", "content": prompt}],
+    }
+
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers=headers,
+        data=json.dumps(payload)
     )
-    advice = resp["choices"][0]["message"]["content"]
-    return jsonify({"advice": advice.replace("\n", "<br>")})
+
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"]
+    else:
+        return f"Ошибка: {response.status_code} — {response.text}"
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    result = None
+    if request.method == "POST":
+        user_input = request.form["user_input"]
+        result = generate_ai_response(user_input)
+    return render_template("index.html", result=result)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
