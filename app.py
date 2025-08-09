@@ -5,11 +5,10 @@ import os
 
 app = Flask(__name__)
 
-import os
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
-REFERER_URL = "https://yourdomain.com"  # (опционально)
-SITE_TITLE = "AI Объявления"  # (опционально)
+REFERER_URL = "https://yourdomain.com"  # поменяй на свой домен
+SITE_TITLE = "AI Объявления"
 
 PROMPT_TEMPLATE = """
 Ты опытный маркетолог и копирайтер. Преобразуй этот текст в продающее объявление, используя техники Игоря Манна, триггеры выгоды, эмоции, ограниченность. Добавь рекомендации по улучшению фотографий.
@@ -27,7 +26,7 @@ def generate_ai_response(user_input):
     }
 
     payload = {
-        "model": "openai/gpt-oss-20b:free",
+        "model": "meta-llama/llama-3.1-70b-instruct",
         "messages": [{"role": "user", "content": prompt}],
     }
 
@@ -40,7 +39,7 @@ def generate_ai_response(user_input):
     if response.status_code == 200:
         return response.json()["choices"][0]["message"]["content"]
     else:
-        return f"Ошибка: {response.status_code} — {response.text}"
+        return f"Ошибка {response.status_code}: {response.text}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
