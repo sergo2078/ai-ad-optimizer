@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: ai-classifieds
-    env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
-    envVars:
-      - key: OPENROUTER_API_KEY
-        value: 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
