@@ -5,21 +5,24 @@ import os
 
 app = Flask(__name__)
 
-# Читаем API-ключ из переменных окружения
+# API-ключ (задаётся в Render → Environment Variables)
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 
-# Заголовки HTTP должны содержать только ASCII!
-REFERER_URL = "https://yourdomain.com"  # Укажи свой домен или оставь дефолт
-SITE_TITLE = "AI-Obyavleniya"  # Без кириллицы, чтобы не было UnicodeEncodeError
+# Только ASCII в заголовках!
+REFERER_URL = "https://yourdomain.com"
+SITE_TITLE = "AI-Obyavleniya"
 
+# Prompt с указанием на короткий результат
 PROMPT_TEMPLATE = """
-Ты опытный с 10 летним стажем маркетолог и копирайтер, знающий все техники продажи товаров и услуг в интернете.
+Ты опытный маркетолог и копирайтер.
 Преобразуй этот текст в продающее объявление, используя техники Игоря Манна, триггеры выгоды, эмоции, ограниченность.
-Добавь рекомендации по улучшению фотографий. Текст только на русском языке в таком формате будто это пишет обычный человек.
-Весь текст объявления должен быть компактным — не более 300-400 символов.
+Добавь рекомендации по улучшению фотографий.
+Весь текст объявления должен быть компактным — не более 400-500 символов.
 Вот описание от пользователя: "{}"
 """
 
+MAX_INPUT_LENGTH = 500
+MAX_OUTPUT_LENGTH = 500
 
 def generate_ai_response(user_input: str) -> str:
     """Генерирует ответ от OpenRouter API с безопасной обработкой ошибок."""
@@ -28,6 +31,9 @@ def generate_ai_response(user_input: str) -> str:
 
     if not user_input.strip():
         return "⚠️ Пожалуйста, введите описание товара."
+
+    if len(user_input) > MAX_INPUT_LENGTH:
+        return f"⚠️ Описание слишком длинное. Максимум {MAX_INPUT_LENGTH} символов."
 
     prompt = PROMPT_TEMPLATE.format(user_input.strip())
 
@@ -57,7 +63,11 @@ def generate_ai_response(user_input: str) -> str:
         return f"❌ API вернул некорректный JSON: {response.text}"
 
     if "choices" in data and data["choices"]:
-        return data["choices"][0]["message"]["content"]
+        result_text = data["choices"][0]["message"]["content"].strip()
+        # Обрезаем, если слишком длинный
+        if len(result_text) > MAX_OUTPUT_LENGTH:
+            result_text = result_text[:MAX_OUTPUT_LENGTH - 3] + "..."
+        return result_text
     elif "error" in data:
         return f"❌ Ошибка API: {data['error']}"
     else:
@@ -73,7 +83,3 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
