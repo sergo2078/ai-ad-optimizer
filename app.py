@@ -5,22 +5,27 @@ import os
 
 app = Flask(__name__)
 
+# API-ключ (задаётся в Render → Environment Variables)
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
-REFERER_URL = "https://yourdomain.com"  # замените на свой домен
+
+# Только ASCII в заголовках!
+REFERER_URL = "https://yourdomain.com"
 SITE_TITLE = "AI-Obyavleniya"
 
+# Prompt с указанием на короткий результат
 PROMPT_TEMPLATE = """
 Ты опытный маркетолог и копирайтер.
 Преобразуй этот текст в продающее объявление, используя техники Игоря Манна, триггеры выгоды, эмоции, ограниченность.
-Добавь рекомендации по улучшению фотографий. Перепроверяй на орфографию текст который выдаешь.
-Весь текст объявления должен быть компактным — не более 250-300 символов.
+Добавь рекомендации по улучшению фотографий.
+Весь текст объявления должен быть компактным — не более 400-500 символов.
 Вот описание от пользователя: "{}"
 """
 
-MAX_INPUT_LENGTH = 200
-MAX_OUTPUT_LENGTH = 300
+MAX_INPUT_LENGTH = 500
+MAX_OUTPUT_LENGTH = 500
 
 def generate_ai_response(user_input: str) -> str:
+    """Генерирует ответ от OpenRouter API с безопасной обработкой ошибок."""
     if not OPENROUTER_API_KEY:
         return "❌ Ошибка: API-ключ не задан. Добавьте OPENROUTER_API_KEY в переменные окружения."
 
@@ -57,26 +62,23 @@ def generate_ai_response(user_input: str) -> str:
     except json.JSONDecodeError:
         return f"❌ API вернул некорректный JSON: {response.text}"
 
-   if "choices" in data and data["choices"]:
-    result_text = data["choices"][0]["message"]["content"].strip()
+    if "choices" in data and data["choices"]:
+        result_text = data["choices"][0]["message"]["content"].strip()
 
-    # Умное обрезание, если текст слишком длинный
-    if len(result_text) > MAX_OUTPUT_LENGTH:
-        # Ищем конец предложения
-        end_pos = max(
-            result_text.rfind('.', 0, MAX_OUTPUT_LENGTH),
-            result_text.rfind('!', 0, MAX_OUTPUT_LENGTH),
-            result_text.rfind('?', 0, MAX_OUTPUT_LENGTH)
-        )
-        # Если нет точки — ищем последний пробел
-        if end_pos == -1:
-            end_pos = result_text.rfind(' ', 0, MAX_OUTPUT_LENGTH)
-        # Если ничего не нашли — жёстко обрезаем
-        if end_pos == -1:
-            end_pos = MAX_OUTPUT_LENGTH
-        result_text = result_text[:end_pos].strip()
-        
-    return result_text
+        # Умное обрезание — ищем конец предложения или слово
+        if len(result_text) > MAX_OUTPUT_LENGTH:
+            end_pos = max(
+                result_text.rfind('.', 0, MAX_OUTPUT_LENGTH),
+                result_text.rfind('!', 0, MAX_OUTPUT_LENGTH),
+                result_text.rfind('?', 0, MAX_OUTPUT_LENGTH)
+            )
+            if end_pos == -1:
+                end_pos = result_text.rfind(' ', 0, MAX_OUTPUT_LENGTH)
+            if end_pos == -1:
+                end_pos = MAX_OUTPUT_LENGTH
+            result_text = result_text[:end_pos].strip()
+
+        return result_text
     elif "error" in data:
         return f"❌ Ошибка API: {data['error']}"
     else:
