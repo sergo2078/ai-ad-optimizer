@@ -17,8 +17,8 @@ PROMPT_TEMPLATE = """
 Вот описание от пользователя: "{}"
 """
 
-MAX_INPUT_LENGTH = 500
-MAX_OUTPUT_LENGTH = 500
+MAX_INPUT_LENGTH = 200
+MAX_OUTPUT_LENGTH = 300
 
 def generate_ai_response(user_input: str) -> str:
     if not OPENROUTER_API_KEY:
