@@ -60,7 +60,20 @@ def generate_ai_response(user_input: str) -> str:
     if "choices" in data and data["choices"]:
         result_text = data["choices"][0]["message"]["content"].strip()
         if len(result_text) > MAX_OUTPUT_LENGTH:
-            result_text = result_text[:MAX_OUTPUT_LENGTH - 3] + "..."
+    # Ищем ближайший конец предложения
+    end_pos = max(
+        result_text.rfind('.', 0, MAX_OUTPUT_LENGTH),
+        result_text.rfind('!', 0, MAX_OUTPUT_LENGTH),
+        result_text.rfind('?', 0, MAX_OUTPUT_LENGTH)
+    )
+    # Если нет точки — ищем последний пробел
+    if end_pos == -1:
+        end_pos = result_text.rfind(' ', 0, MAX_OUTPUT_LENGTH)
+    # Если вообще ничего — просто жёстко обрезаем
+    if end_pos == -1:
+        end_pos = MAX_OUTPUT_LENGTH
+    result_text = result_text[:end_pos].strip()
+
         return result_text
     elif "error" in data:
         return f"❌ Ошибка API: {data['error']}"
