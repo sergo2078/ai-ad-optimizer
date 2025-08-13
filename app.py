@@ -59,7 +59,6 @@ def generate_ai_response(user_input: str) -> str:
 
    if "choices" in data and data["choices"]:
     result_text = data["choices"][0]["message"]["content"].strip()
-
     # Умное обрезание, если текст слишком длинный
     if len(result_text) > MAX_OUTPUT_LENGTH:
         # Ищем конец предложения
