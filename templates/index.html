@@ -62,12 +62,12 @@
         <div class="mb-2">
           <label for="user_input" class="form-label">Описание товара (до 500 символов):</label>
           <textarea 
-            class="form-control" 
-            id="user_input" 
-            name="user_input" 
-            rows="6" 
-            maxlength="500"
-            placeholder="Например: продам Ваз 2110, 200000 рублей, в городе Тюмень...">{{ request.form.get('user_input', '') }}</textarea>
+  class="form-control" 
+  id="user_input" 
+  name="user_input" 
+  rows="6" 
+  maxlength="500"
+  placeholder="Например: продам Ваз 2110, 200000 рублей, в городе Тюмень...">{{ user_input or '' }}</textarea>
           <div id="charCount" class="char-counter">0 / 500</div>
         </div>
         <button type="submit" class="btn btn-gradient w-100">✨ Сгенерировать продающий текст</button>
