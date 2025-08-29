@@ -90,11 +90,16 @@ def generate_ai_response(user_input: str) -> str:
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
+    # Инициализируем user_input здесь, чтобы она всегда существовала
+    user_input = "" 
+    
     if request.method == "POST":
         user_input = request.form.get("user_input", "")
         result = generate_ai_response(user_input)
-    # Передаем исходный текст пользователя обратно в шаблон
+        
+    # Теперь эта строка будет работать и для GET, и для POST запросов
     return render_template("index.html", result=result, user_input=user_input)
+
 
 if __name__ == "__main__":
     # debug=False лучше для продакшена, но для локальной отладки True удобнее
