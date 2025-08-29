@@ -2,8 +2,11 @@ services:
   - type: web
     name: ai-classifieds
     env: python
+    # Устанавливаем версию Python для совместимости
+    pythonVersion: "3.11" 
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
     envVars:
-      - key: OPENROUTER_API_KEY
+      # Меняем ключ на GOOGLE_API_KEY
+      - key: GOOGLE_API_KEY
         sync: false
